@@ -94,7 +94,7 @@ public class HttpParser {
     
     func supportsKeepAlive(_ headers: [String: String]) -> Bool {
         if let value = headers["connection"] {
-            return "keep-alive" == value.trimmingCharacters(in: .whitespaces)
+            return "keep-alive" == value.trimmingCharacters(in: .whitespaces).lowercased()
         }
         return false
     }
