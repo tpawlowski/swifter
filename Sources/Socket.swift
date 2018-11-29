@@ -48,28 +48,28 @@ open class Socket: Hashable, Equatable {
     
     public func port() throws -> in_port_t {
         var addr = sockaddr_in()
-        return try withUnsafePointer(to: &addr) { pointer in
+        try withUnsafePointer(to: &addr) { pointer in
             var len = socklen_t(MemoryLayout<sockaddr_in>.size)
             if getsockname(socketFileDescriptor, UnsafeMutablePointer(OpaquePointer(pointer)), &len) != 0 {
                 throw SocketError.getSockNameFailed(Errno.description())
             }
-            #if os(Linux)
-                return ntohs(addr.sin_port)
-            #else
-                return Int(OSHostByteOrder()) != OSLittleEndian ? addr.sin_port.littleEndian : addr.sin_port.bigEndian
-            #endif
         }
+        #if os(Linux)
+            return ntohs(addr.sin_port)
+        #else
+            return Int(OSHostByteOrder()) != OSLittleEndian ? addr.sin_port.littleEndian : addr.sin_port.bigEndian
+        #endif
     }
     
     public func isIPv4() throws -> Bool {
         var addr = sockaddr_in()
-        return try withUnsafePointer(to: &addr) { pointer in
+        try withUnsafePointer(to: &addr) { pointer in
             var len = socklen_t(MemoryLayout<sockaddr_in>.size)
             if getsockname(socketFileDescriptor, UnsafeMutablePointer(OpaquePointer(pointer)), &len) != 0 {
                 throw SocketError.getSockNameFailed(Errno.description())
             }
-            return Int32(addr.sin_family) == AF_INET
         }
+        return Int32(addr.sin_family) == AF_INET
     }
     
     public func writeUTF8(_ string: String) throws {
